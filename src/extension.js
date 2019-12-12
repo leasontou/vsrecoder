@@ -30,6 +30,9 @@ const vsrecoder = {
 			let now = new Date()
 			let day = util.dateFormat('YYYYmmdd',now)
 			let oldData = context.globalState.get(day,[])
+			if(status==Status.idle && oldData.length>0 && oldData[oldData.length-1].type==Status.idle){
+				return
+			}
 			oldData.push({
 				type: status,
 				time: now.getTime()
@@ -87,7 +90,7 @@ const vsrecoder = {
 			clearInterval(this.idleTimer)
 		}
 
-		let idleInterval = vscode.workspace.getConfiguration().get("idleInterval",10)
+		let idleInterval = vscode.workspace.getConfiguration().get("idleInterval",30)
 		this.idleTimer = setInterval(() => {
 			let now = new Date()
 			// console.log(`onIdle:${util.dateFormat('HH:MM:SS',now)},${this.status},isIdle:${this.isIdle},isCoding:${this.isCoding}`)
