@@ -14,6 +14,8 @@ const vsrecoder = {
 	status: Status.idle,
 	idleTimer: null,
 	codingTimer: null,
+	debugTimer: null,
+	debugTracker: null,
 	isCoding: false,
 	isIdle: false,
 	cleanRecord(context){
@@ -43,20 +45,39 @@ const vsrecoder = {
 		}
 	},
 	startDebug(context){
-		this.status = Status.debug
 		this.isIdle = false
-		this.update(context,Status.debug)
+		if(this.status!=Status.debug){
+			this.status = Status.debug
+			if(this.debugTimer){
+				clearInterval(this.debugTimer)
+			}
+			let debugInterval = vscode.workspace.getConfiguration().get("debugInterval",2*60)
+			this.debugTimer = setInterval(() => {
+				if(this.status==Status.debug){
+					this.stopDebug(context)
+				}
+			}, debugInterval*1000);
+
+			console.log("record debug")
+			this.update(context,Status.debug)
+		}
 	},
 	stopDebug(context){
 		this.status === Status.idle
 		this.isIdle = true
+		if(this.debugTimer){
+			clearInterval(this.debugTimer)
+			this.debugTimer = null
+		}
+		if(this.debugTracker){
+			this.debugTracker.dispose()
+		}
 	},
 	startCoding(context){
 		this.isCoding = true
 		this.isIdle = false
 		if(this.status!=Status.coding){
 			this.status = Status.coding
-			let now = new Date()
 			this.update(context,Status.coding)
 			console.log(`record coding`)
 			if(this.codingTimer){
@@ -106,6 +127,11 @@ const vsrecoder = {
 			clearInterval(this.idleTimer)
 			this.idleTimer = null
 		}
+	},
+	deactivate(){
+		this.stopCoding()
+		this.stopIdleTimer()
+		this.stopDebug()
 	}
 }
 function getWebViewContent(context, templatePath) {
@@ -165,21 +191,26 @@ function activate(context) {
 	vscode.workspace.onDidChangeTextDocument(event => {
 		vsrecoder.startCoding(context)
 	})
-
-	vscode.debug.onDidChangeActiveDebugSession(event => {
-		vsrecoder.startDebug(context)
-	})
-	vscode.debug.onDidChangeBreakpoints(event => {
-		vsrecoder.startDebug(context)
-	})
-	vscode.debug.onDidReceiveDebugSessionCustomEvent(event => {
-		vsrecoder.startDebug(context)
-	})
 	vscode.debug.onDidStartDebugSession(event => {
 		vsrecoder.startDebug(context)
 	})
-vscode.debug.onDidTerminateDebugSession(event => {
+	vscode.debug.onDidTerminateDebugSession(event => {
 		vsrecoder.stopDebug(context)
+	})
+	vsrecoder.debugTracker = vscode.debug.registerDebugAdapterTrackerFactory('*',{
+		createDebugAdapterTracker(session,executable){
+			return {
+				onDidSendMessage(msg){
+				},
+				onWillReceiveMessage(msg){
+					vsrecoder.startDebug(context)
+				},
+				onWillStartSession(){
+				},
+				onWillStopSession(){
+				}
+			}
+		}
 	})
 
 	util.showInfo("vsrecord is working!")
@@ -208,10 +239,8 @@ vscode.debug.onDidTerminateDebugSession(event => {
 }
 exports.activate = activate;
 
-// this method is called when your extension is deactivated
 function deactivate() {
-	stopIdleTimer()
-	stopCodingTimer()
+	vsrecoder.deactivate()
 }
 
 module.exports = {
