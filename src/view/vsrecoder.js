@@ -2,6 +2,26 @@
 const vscode = acquireVsCodeApi();
 const callbacks = {};
 
+function dateFormat(fmt, date) {
+    let ret;
+    let opt = {
+        "Y+": date.getFullYear().toString(),        // 年
+        "m+": (date.getMonth() + 1).toString(),     // 月
+        "d+": date.getDate().toString(),            // 日
+        "H+": date.getHours().toString(),           // 时
+        "M+": date.getMinutes().toString(),         // 分
+        "S+": date.getSeconds().toString()          // 秒
+        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+    };
+    for (let k in opt) {
+        ret = new RegExp("(" + k + ")").exec(fmt);
+        if (ret) {
+            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+        };
+    };
+    return fmt;
+}
+
 /**
  * 调用vscode原生api
  * @param data 可以是类似 {cmd: 'xxx', param1: 'xxx'}，也可以直接是 cmd 字符串
@@ -12,7 +32,6 @@ function callVscode(data, cb) {
         data = { cmd: data };
     }
     if (cb) {
-        // 时间戳加上5位随机数
         const cbid = Date.now() + '' + Math.round(Math.random() * 100000);
         callbacks[cbid] = cb;
         data.cbid = cbid;
@@ -36,82 +55,127 @@ new Vue({
     data: {
     },
     mounted() {
-        callVscode({cmd: 'getRecord', day: '20191210'}, result => {
+        var day = dateFormat('YYYYmmdd',new Date())
+        callVscode({cmd: 'getRecord', day: day}, result => {
             this.updateChart(result)
         });
     },
     methods: {
         updateChart(result){
-            var date = [];
-            var data = []
-            for (var i = 0; i < 24; i++) {
-                for(var j=0;j<60;j+=10){
-                    date.push(`${i<10?'0':''}${i}:${j<10?'0':''}${j}`);
-                    data.push(0)
+            var hours = ['1', '2', '3', '4', '5', '6',
+                    '7', '8', '9','10','11',
+                    '12', '13', '14', '15', '16', '17',
+                    '18', '19', '20', '21', '22', '23','24'];
+            var minutes = ['10', '20', '30',
+                    '40', '50', '60'];
+
+            var data = [];
+            for(var i=0;i<hours.length;i++){
+                for(var j=0;j<minutes.length;j++){
+                    data.push([i,j,0])
                 }
             }
             result.forEach(r => {
                 var recordTime = new Date(r.time)
                 var hour = recordTime.getHours()
-                var minute = Math.ceil((recordTime.getMinutes()*60+recordTime.getSeconds())/600)
-                if(r.type==='coding'){
-                    data[hour*6+minute] += 10
+                var minute = Math.ceil((recordTime.getMinutes()*60+recordTime.getSeconds())/600)-1
+                if(r.type==='coding' || r.type==='debug'){
+                    var cell = data[hour*6+minute]
+                    data[hour*6+minute] = [cell[0],cell[1],5]
                 }
             })
 
-            let xAxis = Array.from(new Set(result.map(r => r.type)))
-            // let data = xAxis.map(x => result.filter(r => r.type==x).length)
-            var myChart = echarts.init(this.$refs.chart, 'dark');
-            // 指定图表的配置项和数据
+            data = data.map(function (item) {
+                return [item[0], item[1], item[2] || '-'];
+            });
             var option = {
-                title: {
-                    left: 'center',
-                    text: 'VS Recoder'
-                },
                 tooltip: {
-                    trigger: 'axis',
-                    position: function (pt) {
-                        return [pt[0], '10%'];
-                    }
+                    position: 'top'
+                },
+                animation: false,
+                grid: {
+                    top: 20,
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                    containLabel: true,
+                    show: true,
+                    backgroundColor: '#e0e0e0',
                 },
                 xAxis: {
                     type: 'category',
-                    boundaryGap: false,
-                    data: date
+                    data: hours,
+                    zlevel: 100,
+                    splitLine: {
+                        show: true,
+                        interval: 0,
+                        lineStyle:{
+                           color: ['rgba(200,200,200,0.8)'],
+                           width: 1,
+                           type: 'solid'
+                        }
+                　　},
+                    // splitArea: {
+                    //     show: true,
+                    //     areaStyle: {
+                    //         color: ['rgba(250,250,250,0.9)','rgba(200,200,200,0.5)']
+                    //     }
+                    // },
+                    axisTick: {
+                        show: false
+                    }
                 },
                 yAxis: {
-                    type: 'value',
-                    boundaryGap: [0, '50%']
+                    type: 'category',
+                    data: minutes,
+                    zlevel: 100,
+                    splitLine: {
+                        show: true,
+                        interval: 0,
+                        lineStyle:{
+                            color: ['rgba(200,200,200,0.8)'],
+                           width: 1,
+                           type: 'solid'
+                        }
+                　　},
+                    // splitArea: {
+                    //     show: true,
+                    //     areaStyle: {
+                    //         color: ['rgba(250,250,250,0.9)','rgba(200,200,200,1)']
+                    //     }
+                    // },
+                    axisTick: {
+                        show: false
+                    }
                 },
+                // visualMap: {
+                //     min: 0,
+                //     max: 10,
+                //     calculable: true,
+                //     orient: 'horizontal',
+                //     left: 'center',
+                //     bottom: '15%'
+                // },
                 series: [{
-                    name: 'Coding record',
-                    type: 'line',
-                    smooth: true,
-                    symbol: 'none',
-                    sampling: 'average',
+                    name: 'Punch Card',
+                    type: 'heatmap',
+                    data: data,
+                    label: {
+                        normal: {
+                            show: true
+                        }
+                    },
                     itemStyle: {
-                        color: 'rgb(255, 70, 131)'
-                    },
-                    areaStyle: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                            offset: 0,
-                            color: 'rgb(255, 158, 68)'
-                        }, {
-                            offset: 1,
-                            color: 'rgb(255, 70, 131)'
-                        }])
-                    },
-                    data: data
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
                 }]
             };
 
-            // 使用刚指定的配置项和数据显示图表。
+            var myChart = echarts.init(this.$refs.chart, 'dark');
             myChart.setOption(option);
-        },
-        test(){
-            callVscode({cmd: 'getRecord', day: '20191210'}, result => {
-                this.updateChart(result)
-            });
         },
         getTime() {
             const hour = new Date().getHours();

@@ -1,4 +1,5 @@
 {
+	"publisher": "Leason",
 	"name": "vsrecode",
 	"displayName": "vsrecode",
 	"description": "recoder for vscode",
@@ -42,7 +43,8 @@
 		]
 	},
 	"scripts": {
-		"test": "node ./test/runTest.js"
+		"test": "node ./test/runTest.js",
+		"package": "vsce package"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",

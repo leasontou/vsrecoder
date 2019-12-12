@@ -1,5 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
 const util = require('./util');
@@ -28,14 +26,19 @@ const vsrecoder = {
 		return data
 	},
 	update(context,status){
-		let now = new Date()
-		let day = util.dateFormat('YYYYmmdd',now)
-		let oldData = context.globalState.get(day,[])
-		oldData.push({
-			type: status,
-			time: now.getTime()
-		})
-		context.globalState.update(day, oldData)
+		try {
+			let now = new Date()
+			let day = util.dateFormat('YYYYmmdd',now)
+			let oldData = context.globalState.get(day,[])
+			oldData.push({
+				type: status,
+				time: now.getTime()
+			})
+			context.globalState.update(day, oldData)
+		} catch (error) {
+			util.showError(error)
+		}
+		
 	},
 	startDebug(context){
 		this.status = Status.debug
@@ -144,9 +147,11 @@ const messageHandler = {
 		vscode.workspace.getConfiguration().update(message.key, message.value, true);
 		util.showInfo('修改配置成功！');
 	},
+
 	getRecord(context,global, message){
 		let day = message.day
 		let result = vsrecoder.getRecord(context,day)
+		console.log(result)
 		invokeCallback(global.panel, message, result);
 	}
 };
@@ -157,7 +162,6 @@ const messageHandler = {
 function activate(context) {
 	// vsrecoder.cleanRecord(context)
 	context.subscriptions.push(vscode.commands.registerCommand('extension.enableRecode', function (){
-		util.showInfo("插件已启用")
 		vsrecoder.startIdle(context)
 		vscode.workspace.onDidChangeTextDocument(event => {
 			vsrecoder.startCoding(context)
@@ -172,18 +176,22 @@ function activate(context) {
 			console.log("stop debug")
 			vsrecoder.stopDebug(context)
 		})
-	}))
 
+		util.showInfo("插件启用")
+	}))
+	
 	context.subscriptions.push(vscode.commands.registerCommand('extension.showRecode', function (){
 		const panel = vscode.window.createWebviewPanel(
 				'VSRecode',
 				"VS Recode",
 				vscode.ViewColumn.One,
 				{
-						enableScripts: true,
+					enableScripts: true,
 				}
 		);
+
 		let global = { panel};
+
 		panel.webview.html = getWebViewContent(context, 'src/view/vsrecoder.html');
 		panel.webview.onDidReceiveMessage(message => {
 				if (messageHandler[message.cmd]) {
