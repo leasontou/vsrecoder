@@ -11,31 +11,22 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.enableRecode"
+		"*"
 	],
 	"main": "./src/extension.js",
 	"contributes": {
 		"configuration": {
 			"type": "object",
-			"title": "Code插件demo",
+			"title": "VSRecoder",
 			"properties": {
-					"vsrecode.yourName": {
-							"type": "string",
-							"default": "guest",
-							"description": "你的名字"
-					},
-					"vsrecode.showTip": {
+					"vsrecode.enable": {
 							"type": "boolean",
 							"default": true,
-							"description": "启动时显示自定义欢迎页"
+							"description": "enable record"
 					}
 			}
 		},
 		"commands": [
-			{
-				"command": "extension.enableRecode",
-				"title": "Enable VSRecode"
-			},
 			{
 				"command": "extension.showRecode",
 				"title": "Show Recode"

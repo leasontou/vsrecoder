@@ -38,7 +38,6 @@ const vsrecoder = {
 		} catch (error) {
 			util.showError(error)
 		}
-		
 	},
 	startDebug(context){
 		this.status = Status.debug
@@ -60,9 +59,8 @@ const vsrecoder = {
 			if(this.codingTimer){
 				clearInterval(this.codingTimer)
 			}
-			let codingInterval = vscode.workspace.getConfiguration().get("codingInterval",10)
+			let codingInterval = vscode.workspace.getConfiguration().get("codingInterval",1*60)
 			this.codingTimer = setInterval(() => {
-				// console.log(`onCoding:${util.dateFormat('HH:MM:SS',now)},${this.status},isIdle:${this.isIdle},isCoding:${this.isCoding}`)
 				if(this.status==Status.coding){
 					if(this.isCoding){
 						this.stopCoding(context)
@@ -160,25 +158,28 @@ const messageHandler = {
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	// vsrecoder.cleanRecord(context)
-	context.subscriptions.push(vscode.commands.registerCommand('extension.enableRecode', function (){
-		vsrecoder.startIdle(context)
-		vscode.workspace.onDidChangeTextDocument(event => {
-			vsrecoder.startCoding(context)
-		})
+	vsrecoder.startIdle(context)
+	vscode.workspace.onDidChangeTextDocument(event => {
+		vsrecoder.startCoding(context)
+	})
 
-		vscode.debug.onDidStartDebugSession(event => {
-			console.log("start debug")
-			vsrecoder.startDebug(context)
-		})
+	vscode.debug.onDidChangeActiveDebugSession(event => {
+		vsrecoder.startDebug(context)
+	})
+	vscode.debug.onDidChangeBreakpoints(event => {
+		vsrecoder.startDebug(context)
+	})
+	vscode.debug.onDidReceiveDebugSessionCustomEvent(event => {
+		vsrecoder.startDebug(context)
+	})
+	vscode.debug.onDidStartDebugSession(event => {
+		vsrecoder.startDebug(context)
+	})
+vscode.debug.onDidTerminateDebugSession(event => {
+		vsrecoder.stopDebug(context)
+	})
 
-		vscode.debug.onDidTerminateDebugSession(event => {
-			console.log("stop debug")
-			vsrecoder.stopDebug(context)
-		})
-
-		util.showInfo("插件启用")
-	}))
+	util.showInfo("vsrecord is working!")
 	
 	context.subscriptions.push(vscode.commands.registerCommand('extension.showRecode', function (){
 		const panel = vscode.window.createWebviewPanel(
@@ -197,7 +198,7 @@ function activate(context) {
 				if (messageHandler[message.cmd]) {
 						messageHandler[message.cmd](context,global, message);
 				} else {
-						util.showError(`未找到名为 ${message.cmd} 回调方法!`);
+						util.showError(`${message.cmd} not found`);
 				}
 		}, undefined, context.subscriptions)
 	}))

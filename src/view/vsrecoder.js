@@ -50,6 +50,13 @@ window.addEventListener('message', event => {
     }
 });
 
+function paddingZero(value){
+    if(value<10){
+        return '0'+value
+    }
+    return value
+}
+
 new Vue({
     el: '#app',
     data: {
@@ -62,17 +69,17 @@ new Vue({
     },
     methods: {
         updateChart(result){
-            var hours = ['1', '2', '3', '4', '5', '6',
-                    '7', '8', '9','10','11',
+            var hours = ['00','01', '02', '03', '04', '05', '06',
+                    '07', '08', '09','10','11',
                     '12', '13', '14', '15', '16', '17',
-                    '18', '19', '20', '21', '22', '23','24'];
-            var minutes = ['10', '20', '30',
-                    '40', '50', '60'];
+                    '18', '19', '20', '21', '22', '23'];
+            var minutes = ['00', '10', '20',
+                    '30', '40', '50'];
 
             var data = [];
             for(var i=0;i<hours.length;i++){
                 for(var j=0;j<minutes.length;j++){
-                    data.push([i,j,0])
+                    data.push([i,j,0,[]])
                 }
             }
             result.forEach(r => {
@@ -81,88 +88,89 @@ new Vue({
                 var minute = Math.ceil((recordTime.getMinutes()*60+recordTime.getSeconds())/600)-1
                 if(r.type==='coding' || r.type==='debug'){
                     var cell = data[hour*6+minute]
-                    data[hour*6+minute] = [cell[0],cell[1],5]
+                    cell[3].push(r.type)
+                    data[hour*6+minute] = [cell[0],cell[1],cell[2]+1, Array.from(new Set(cell[3]))]
                 }
             })
 
             data = data.map(function (item) {
-                return [item[0], item[1], item[2] || '-'];
+                return [item[0], item[1], item[2] || '-', item[3]];
             });
             var option = {
                 tooltip: {
-                    position: 'top'
+                    position: 'top',
+                    formatter: function(params){
+                        var startHour = params.value[0]
+                        var startMinute = params.value[1]
+                        var endHour = startMinute<5?startHour:startHour+1
+                        var endMinute = startMinute<5?(startMinute+1):0
+                        var tasks = params.value[3].join(" & ")
+                        var frequency = params.value[2]
+                        return `${tasks}<br />frequency: ${frequency}<br />${params.marker}${paddingZero(startHour)}:${paddingZero(startMinute*10)}-${paddingZero(endHour)}:${paddingZero(endMinute*10)}`
+                    }
                 },
                 animation: false,
                 grid: {
-                    top: 20,
-                    bottom: 20,
-                    left: 20,
-                    right: 20,
-                    containLabel: true,
+                    top: 'middle',
+                    left: 'center',
+                    width: 640,
+                    height: 160,
+                    containLabel: false,
                     show: true,
-                    backgroundColor: '#e0e0e0',
+                    backgroundColor: '#ebedf0',
+                },
+                visualMap: {
+                    show: false,
+                    min: 0,
+                    max: 10,
+                    dimension: 2,
+                    calculable: false,
+                    orient: 'horizontal',
+                    left: 'center',
                 },
                 xAxis: {
                     type: 'category',
+                    name: 'Hour',
                     data: hours,
                     zlevel: 100,
                     splitLine: {
                         show: true,
                         interval: 0,
                         lineStyle:{
-                           color: ['rgba(200,200,200,0.8)'],
+                           color: ['rgba(255,255,255,1)'],
                            width: 1,
                            type: 'solid'
                         }
                 　　},
-                    // splitArea: {
-                    //     show: true,
-                    //     areaStyle: {
-                    //         color: ['rgba(250,250,250,0.9)','rgba(200,200,200,0.5)']
-                    //     }
-                    // },
                     axisTick: {
                         show: false
                     }
                 },
                 yAxis: {
                     type: 'category',
+                    name: 'Minute',
                     data: minutes,
                     zlevel: 100,
                     splitLine: {
                         show: true,
                         interval: 0,
                         lineStyle:{
-                            color: ['rgba(200,200,200,0.8)'],
-                           width: 1,
-                           type: 'solid'
+                            color: ['rgba(255,255,255,1)'],
+                            width: 1,
+                            type: 'solid'
                         }
                 　　},
-                    // splitArea: {
-                    //     show: true,
-                    //     areaStyle: {
-                    //         color: ['rgba(250,250,250,0.9)','rgba(200,200,200,1)']
-                    //     }
-                    // },
                     axisTick: {
                         show: false
                     }
                 },
-                // visualMap: {
-                //     min: 0,
-                //     max: 10,
-                //     calculable: true,
-                //     orient: 'horizontal',
-                //     left: 'center',
-                //     bottom: '15%'
-                // },
                 series: [{
-                    name: 'Punch Card',
+                    name: 'Coding record',
                     type: 'heatmap',
                     data: data,
                     label: {
                         normal: {
-                            show: true
+                            show: false
                         }
                     },
                     itemStyle: {
