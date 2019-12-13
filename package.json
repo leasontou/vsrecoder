@@ -1,10 +1,10 @@
 {
 	"publisher": "Leason",
 	"name": "vsrecoder",
-	"displayName": "vsrecoder",
-	"description": "recoder for vscode",
+	"displayName": "vsrecorder",
+	"description": "recorder for vscode",
 	"icon": "images/icon.png",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
@@ -21,14 +21,14 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.vsrecoder.showRecode",
-				"title": "Show VSRecode"
+				"command": "extension.vsrecoder.showRecord",
+				"title": "Show VSRecord"
 			}
 		],
 		"menus": {
 			"editor/context": [
 				{
-					"command": "extension.vsrecoder.showRecode",
+					"command": "extension.vsrecoder.showRecord",
 					"group": "commandPalette"
 				}
 			]

@@ -1,10 +1,10 @@
 ## Features
 
-Recode you coding time.
+Record you coding time.
 
 ## How to use
 
-After install this extension, you can find `Show VSRecode` in your editor context menu:
+After install this extension, you can find `Show VSRecord` in your editor context menu:
 
 <p><img src="https://github.com/leasontou/vsrecoder/raw/master/images/menu.jpg" alt="menu" width="280px"></p>
 

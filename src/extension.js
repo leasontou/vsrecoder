@@ -196,10 +196,10 @@ function activate(context) {
 		}
 	})
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.vsrecoder.showRecode', function (){
+	context.subscriptions.push(vscode.commands.registerCommand('extension.vsrecoder.showRecord', function (){
 		const panel = vscode.window.createWebviewPanel(
-				'VSRecoder',
-				"VSRecoder",
+				'VSRecorder',
+				"VSRecorder",
 				vscode.ViewColumn.One,
 				{
 					enableScripts: true,
