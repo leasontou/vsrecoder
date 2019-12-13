@@ -11,6 +11,9 @@
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"record"
+	],
 	"activationEvents": [
 		"*"
 	],
@@ -47,6 +50,8 @@
 		"vscode-test": "^1.2.2"
 	},
 	"repository": {
+		"type": "git",
 		"url": "https://github.com/leasontou/vsrecoder.git"
-	}
+	},
+	"license": "MIT"
 }
