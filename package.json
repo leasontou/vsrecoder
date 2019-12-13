@@ -1,8 +1,9 @@
 {
 	"publisher": "Leason",
-	"name": "vsrecode",
-	"displayName": "vsrecode",
+	"name": "vsrecoder",
+	"displayName": "vsrecoder",
 	"description": "recoder for vscode",
+	"icon": "images/icon.png",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.40.0"
@@ -15,23 +16,20 @@
 	],
 	"main": "./src/extension.js",
 	"contributes": {
-		"configuration": {
-			"type": "object",
-			"title": "VSRecoder",
-			"properties": {
-					"vsrecode.enable": {
-							"type": "boolean",
-							"default": true,
-							"description": "enable record"
-					}
-			}
-		},
 		"commands": [
 			{
-				"command": "extension.showRecode",
-				"title": "Show Recode"
+				"command": "extension.vsrecoder.showRecode",
+				"title": "Show VSRecode"
 			}
-		]
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "extension.vsrecoder.showRecode",
+					"group": "commandPalette"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"test": "node ./test/runTest.js",
@@ -47,5 +45,8 @@
 		"mocha": "^6.2.2",
 		"typescript": "^3.6.4",
 		"vscode-test": "^1.2.2"
+	},
+	"repository": {
+		"url": "https://github.com/leasontou/vsrecoder.git"
 	}
 }

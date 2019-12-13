@@ -8,14 +8,45 @@
     .daterangepicker{
         color: #212121!important;
     }
+    #datepicker{
+        padding: 10px;
+        margin-top: 10px; 
+        display: inline-block;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        position: relative;
+    }
+    #datepicker::after{
+        position: absolute;
+        content: " ";
+        top: 18px;
+        bottom: 50%;
+        right: -3px;
+        height: 5px;
+        width: 5px;
+        border-width: 0 2px 2px 0;
+        border-style: solid;
+        -webkit-transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+        transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+    }
     </style>
 </head>
 
 <body>
     <div id="app" class="container-fluid">
-        <div style="margin-top:40px;width: 750px;background: #333333;text-align: center;">
-            <span id="datepicker" style="padding: 10px;margin-top: 10px; display: inline-block;font-size: 20px;font-weight: bold;">{{currentDate}}</span>
+        <div style="margin-top:40px;width: 750px;background: #333333;">
+            <div style="text-align: center;">
+                <span id="datepicker">{{currentDate}}</span>
+            </div>
             <div ref="chart" style="height:250px;"></div>
+            <div style="padding-bottom:20px;color: #9E9E9E;">
+                <span style="padding-left: 32px;">tips:</span>
+                <ul style="padding-left: 50px;margin-top: 5px;">
+                    <li>Task: your working information</li>
+                    <li>Contributions: calculated by your coding and debug actions</li>
+                </ul>
+            </div>
         </div>
     </div>
     <script src="../../lib/jquery.min.js"></script>

@@ -133,19 +133,19 @@ new Vue({
                         var endHour = startMinute<5?startHour:startHour+1
                         var endMinute = startMinute<5?(startMinute+1):0
                         var tasks = params.value[3].join("<br />")
-                        var frequency = params.value[2]
+                        var contributions = params.value[2]
                         return `
                         <table border="0" style="border-collapse:collapse;">
                             <tr>
                                 <th colspan="2" style="padding: 5px;">${params.marker}${paddingZero(startHour)}:${paddingZero(startMinute*10)}-${paddingZero(endHour)}:${paddingZero(endMinute*10)}</th>
                             </tr>
                             <tr>
-                                <td valign="top style="padding: 2px 5px;">Task</td>
+                                <td valign="top" style="padding: 2px 5px;">Task</td>
                                 <td valign="top" align="right" style="padding: 2px 5px;">${tasks}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 2px 5px;">Frequency</td>
-                                <td align="right" style="padding: 2px 5px;">${frequency}</td>
+                                <td style="padding: 2px 5px;">Contributions</td>
+                                <td align="right" style="padding: 2px 5px;">${contributions}</td>
                             </tr>
                         </table>
                         `
@@ -164,7 +164,7 @@ new Vue({
                 visualMap: {
                     show: false,
                     min: 0,
-                    max: 10,
+                    max: 15,
                     dimension: 2,
                     calculable: false,
                     orient: 'horizontal',
