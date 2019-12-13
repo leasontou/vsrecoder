@@ -4,12 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VS Recoder</title>
+    <style>
+    .daterangepicker{
+        color: #212121!important;
+    }
+    </style>
 </head>
 
 <body>
     <div id="app" class="container-fluid">
-        <div ref="chart" style="width: 750px;height:250px;margin-top:40px;"></div>
+        <div style="margin-top:40px;width: 750px;background: #333333;text-align: center;">
+            <span id="datepicker" style="padding: 10px;margin-top: 10px; display: inline-block;font-size: 20px;font-weight: bold;">{{currentDate}}</span>
+            <div ref="chart" style="height:250px;"></div>
+        </div>
     </div>
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/moment.min.js"></script>
+    <script src="../../lib/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../lib/daterangepicker.css" />
     <script src="../../lib/vue@2.6.0.js"></script>
     <script src="../../lib/echarts/echarts.min.js"></script>
     <script src="../../lib/echarts/dark.js"></script>

@@ -56,19 +56,40 @@ function paddingZero(value){
     }
     return value
 }
-
 new Vue({
     el: '#app',
     data: {
+        dateForShow: moment(),
+        // currentDate: moment().format('YYYY-MM-DD')
     },
     mounted() {
         var day = dateFormat('YYYYmmdd',new Date())
         callVscode({cmd: 'getRecord', day: day}, result => {
-            this.updateChart(result)
+            this.updateChart(result, day)
         });
+        $("#datepicker").daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            opens: 'center',
+          }, (start,end,label) => {
+            this.dateForShow = start
+          });
+    },
+    computed:{
+        currentDate(){
+            return this.dateForShow.format('YYYY-MM-DD')
+        }
+    },
+    watch: {
+        dateForShow(val){
+            var day = this.dateForShow.format('YYYYMMDD')
+            callVscode({cmd: 'getRecord', day: day}, result => {
+                this.updateChart(result, day)
+            });
+        }
     },
     methods: {
-        updateChart(result){
+        updateChart(result,startDay){
             var hours = ['00','01', '02', '03', '04', '05', '06',
                     '07', '08', '09','10','11',
                     '12', '13', '14', '15', '16', '17',
@@ -97,19 +118,40 @@ new Vue({
                 return [item[0], item[1], item[2] || '-', item[3]];
             });
             var option = {
+                title: {
+                    show: false,
+                    text: `${startDay.substr(0,4)}-${startDay.substr(4,2)}-${startDay.substr(6,2)}`,
+                    left: 'center',
+                    top: 10,
+                },
                 tooltip: {
                     position: 'top',
+                    padding: 0,
                     formatter: function(params){
                         var startHour = params.value[0]
                         var startMinute = params.value[1]
                         var endHour = startMinute<5?startHour:startHour+1
                         var endMinute = startMinute<5?(startMinute+1):0
-                        var tasks = params.value[3].join(" & ")
+                        var tasks = params.value[3].join("<br />")
                         var frequency = params.value[2]
-                        return `${tasks}<br />frequency: ${frequency}<br />${params.marker}${paddingZero(startHour)}:${paddingZero(startMinute*10)}-${paddingZero(endHour)}:${paddingZero(endMinute*10)}`
+                        return `
+                        <table border="0" style="border-collapse:collapse;">
+                            <tr>
+                                <th colspan="2" style="padding: 5px;">${params.marker}${paddingZero(startHour)}:${paddingZero(startMinute*10)}-${paddingZero(endHour)}:${paddingZero(endMinute*10)}</th>
+                            </tr>
+                            <tr>
+                                <td valign="top style="padding: 2px 5px;">Task</td>
+                                <td valign="top" align="right" style="padding: 2px 5px;">${tasks}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 2px 5px;">Frequency</td>
+                                <td align="right" style="padding: 2px 5px;">${frequency}</td>
+                            </tr>
+                        </table>
+                        `
                     }
                 },
-                animation: false,
+                animation: true,
                 grid: {
                     top: 'middle',
                     left: 'center',

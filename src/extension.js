@@ -178,7 +178,6 @@ const messageHandler = {
 	getRecord(context,global, message){
 		let day = message.day
 		let result = vsrecoder.getRecord(context,day)
-		console.log(result)
 		invokeCallback(global.panel, message, result);
 	}
 };
@@ -213,12 +212,10 @@ function activate(context) {
 		}
 	})
 
-	util.showInfo("vsrecord is working!")
-	
 	context.subscriptions.push(vscode.commands.registerCommand('extension.showRecode', function (){
 		const panel = vscode.window.createWebviewPanel(
-				'VSRecode',
-				"VS Recode",
+				'VSRecoder',
+				"VSRecoder",
 				vscode.ViewColumn.One,
 				{
 					enableScripts: true,
