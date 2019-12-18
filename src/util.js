@@ -8,13 +8,12 @@ const util = {
     dateFormat(fmt, date) {
         let ret;
         let opt = {
-            "Y+": date.getFullYear().toString(),        // 年
-            "m+": (date.getMonth() + 1).toString(),     // 月
-            "d+": date.getDate().toString(),            // 日
-            "H+": date.getHours().toString(),           // 时
-            "M+": date.getMinutes().toString(),         // 分
-            "S+": date.getSeconds().toString()          // 秒
-            // 有其他格式化字符需求可以继续添加，必须转化成字符串
+            "Y+": date.getFullYear().toString(),        
+            "m+": (date.getMonth() + 1).toString(),     
+            "d+": date.getDate().toString(),            
+            "H+": date.getHours().toString(),           
+            "M+": date.getMinutes().toString(),         
+            "S+": date.getSeconds().toString()          
         };
         for (let k in opt) {
             ret = new RegExp("(" + k + ")").exec(fmt);
@@ -43,8 +42,6 @@ const util = {
         let projectPath = null;
 
         let workspaceFolders = vscode.workspace.workspaceFolders.map(item => item.uri.path);
-        // 由于存在Multi-root工作区，暂时没有特别好的判断方法，先这样粗暴判断
-        // 如果发现只有一个根文件夹，读取其子文件夹作为 workspaceFolders
         if (workspaceFolders.length == 1 && workspaceFolders[0] === vscode.workspace.rootPath) {
             const rootPath = workspaceFolders[0];
             var files = fs.readdirSync(rootPath);
@@ -63,9 +60,6 @@ const util = {
         }
         return projectPath;
     },
-    /**
-     * 获取当前工程名
-     */
     getProjectName: function(projectPath) {
         return path.basename(projectPath);
     },

@@ -161,11 +161,13 @@ const messageHandler = {
 		vscode.workspace.getConfiguration().update(message.key, message.value, true);
 		util.showInfo('Setting updated');
 	},
-
 	getRecord(context,global, message){
 		let day = message.day
 		let result = vsrecoder.getRecord(context,day)
 		invokeCallback(global.panel, message, result);
+	},
+	saveImage(context,global,message){
+		util.writeImage(message.data,message.filename)
 	}
 };
 

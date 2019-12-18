@@ -4,7 +4,7 @@
 	"displayName": "vsrecorder",
 	"description": "recorder for vscode",
 	"icon": "images/icon.png",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
@@ -19,6 +19,16 @@
 	],
 	"main": "./src/extension.js",
 	"contributes": {
+		"configuration":{
+			"title": "VSRecorder",
+			"properties": {
+				"vsrecorder.name": {
+					"type":"string",
+					"default":"VSRecorder",
+					"description": "Your name"
+				}
+			}
+		},
 		"commands": [
 			{
 				"command": "extension.vsrecoder.showRecord",

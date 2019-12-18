@@ -60,9 +60,10 @@ new Vue({
     el: '#app',
     data: {
         dateForShow: moment(),
-        // currentDate: moment().format('YYYY-MM-DD')
+        name: 'VSRecorder'
     },
     mounted() {
+        callVscode({cmd: 'getConfig', key: 'vsrecorder.name'}, name => this.name = name);
         var day = dateFormat('YYYYmmdd',new Date())
         callVscode({cmd: 'getRecord', day: day}, result => {
             this.updateChart(result, day)
